@@ -155,7 +155,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
 
           {/* Menu Grid */}
           <div className="px-6 pb-6">
-            <h3 className="text-xl font-bold mb-4">{activeCategory}</h3>
+            <h3 className="text-xl font-bold mb-4 font-['Poppins']">{activeCategory}</h3>
             <div className="grid grid-cols-2 gap-x-4 gap-y-6">
               {filteredMenu.map((item, idx) => (
                 <div 
@@ -179,17 +179,21 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                   </div>
 
                   <div className="flex flex-col flex-1">
-                    <h4 className="font-bold text-gray-900 text-base leading-tight mb-2">{item.name}</h4>
+                    {/* Poppins Font for Name - Semi Bold */}
+                    <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
                     
                     <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-4">
                         {item.description}
                     </p>
 
                     <div className="flex items-end justify-between mt-auto">
-                        <span className="text-lg font-bold text-gray-900">${item.price}</span>
+                        {/* Poppins Font for Price, styled like the reference - Semi Bold */}
+                        <span className="font-['Poppins'] text-xl font-semibold text-gray-900 flex items-baseline gap-0.5">
+                            <span className="text-sm align-top pt-0.5">$</span>{item.price}
+                        </span>
                         
                         {/* Spiciness Indicators */}
-                        <div className="flex gap-0.5">
+                        <div className="flex gap-0.5 mb-1">
                             {item.isSpicy && (
                                <>
                                  <Flame size={14} className="text-red-500 fill-red-500" />
@@ -251,8 +255,9 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
 
           <div className="px-6 py-6 pb-32">
             <div className="flex justify-between items-start mb-6">
-                <h1 className="text-2xl font-bold text-gray-900 w-3/4 leading-tight">{selectedItem.name}</h1>
-                <span className="text-2xl font-bold text-teal-500">${selectedItem.price}</span>
+                {/* Semi Bold for detail view too */}
+                <h1 className="text-2xl font-['Poppins'] font-semibold text-gray-900 w-3/4 leading-tight">{selectedItem.name}</h1>
+                <span className="text-2xl font-['Poppins'] font-semibold text-teal-500">${selectedItem.price}</span>
             </div>
 
             {/* Nutrition Summary */}
@@ -327,7 +332,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 <button onClick={() => setIsCartOpen(false)} className="p-2 -ml-2 hover:bg-gray-50 rounded-full">
                     <X size={24} />
                 </button>
-                <span className="font-bold text-lg">Cart</span>
+                <span className="font-bold text-lg font-['Poppins']">Cart</span>
                 <div className="w-8"></div> {/* Spacer */}
             </div>
 
@@ -354,8 +359,8 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1">
-                                    <h4 className="font-bold text-gray-900 text-sm mb-1">{item.name}</h4>
-                                    <p className="font-bold text-teal-500 text-sm">${item.price}</p>
+                                    <h4 className="font-semibold font-['Poppins'] text-gray-900 text-sm mb-1">{item.name}</h4>
+                                    <p className="font-semibold font-['Poppins'] text-teal-500 text-sm">${item.price}</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-2 py-1">
                                     <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-600"><Minus size={14}/></button>
@@ -410,7 +415,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
             <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6 safe-area-bottom">
                 <div className="flex justify-between items-end mb-4">
                     <span className="text-gray-400 text-sm font-medium">Total</span>
-                    <span className="font-bold text-2xl text-gray-900">${finalTotal.toFixed(2)}</span>
+                    <span className="font-semibold text-2xl text-gray-900 font-['Poppins']">${finalTotal.toFixed(2)}</span>
                 </div>
                 <button 
                     onClick={handlePlaceOrder}
