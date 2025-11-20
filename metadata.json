@@ -1,0 +1,7 @@
+{
+  "name": "DineFlow AI",
+  "description": "A comprehensive restaurant management suite featuring a customer ordering portal with AI recommendations, a kitchen display system for chefs, and an administrative dashboard for payments and refunds.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
