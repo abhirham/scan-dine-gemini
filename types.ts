@@ -22,6 +22,7 @@ export interface MenuItem {
   image: string;
   isVegetarian?: boolean;
   isSpicy?: boolean;
+  isPopular?: boolean;
   calories?: number;
   protein?: string;
   fats?: string;

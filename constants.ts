@@ -17,7 +17,8 @@ export const MENU_ITEMS: MenuItem[] = [
     sugar: '2g',
     ingredients: ['Dried spaghetti', 'Chicken breast', 'Yellow onion', 'Green garlic', 'Olive oil', 'Red pepper', 'Broccoli'],
     allergens: ['Gluten', 'Soy'],
-    isSpicy: true
+    isSpicy: true,
+    isPopular: true
   },
   {
     id: '2',
@@ -48,7 +49,8 @@ export const MENU_ITEMS: MenuItem[] = [
     carbs: '40g',
     sugar: '3g',
     ingredients: ['Tortilla wrap', 'Grilled chicken', 'Lettuce', 'Tomato', 'Mayonnaise'],
-    allergens: ['Gluten', 'Eggs']
+    allergens: ['Gluten', 'Eggs'],
+    isPopular: true
   },
   {
     id: '4',
@@ -78,7 +80,8 @@ export const MENU_ITEMS: MenuItem[] = [
     carbs: '55g',
     sugar: '4g',
     ingredients: ['Beef steak', 'White rice', 'Broccoli', 'Soy sauce', 'Garlic'],
-    allergens: ['Soy']
+    allergens: ['Soy'],
+    isPopular: true
   },
   {
     id: '6',

@@ -7,7 +7,6 @@ import {
   Plus, 
   Minus, 
   X, 
-  Home, 
   MapPin, 
   FileText, 
   User, 
@@ -15,8 +14,8 @@ import {
   Coffee, 
   Sandwich, 
   Cookie, 
-  CreditCard,
-  ArrowLeft
+  Heart,
+  Flame
 } from 'lucide-react';
 import { SmartWaiter } from './ui/SmartWaiter';
 
@@ -157,28 +156,50 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
           {/* Menu Grid */}
           <div className="px-6 pb-6">
             <h3 className="text-xl font-bold mb-4">{activeCategory}</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6">
               {filteredMenu.map((item, idx) => (
                 <div 
                   key={item.id} 
                   onClick={() => setSelectedItem(item)}
-                  className="bg-white p-3 rounded-[1.5rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up"
+                  className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-col h-full"
                   style={{ animationDelay: `${idx * 50}ms` }}
                 >
-                  <div className="relative w-full aspect-square mb-3">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.2rem]" />
-                    <button 
-                      className="absolute bottom-2 right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center text-red-600 hover:scale-110 transition-transform"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addToCart(item);
-                      }}
-                    >
-                      <Plus size={18} strokeWidth={3} />
-                    </button>
+                  <div className="relative w-full aspect-[4/3] mb-4">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
+                    
+                    {/* Heart Icon (top right) - Only for Popular Items */}
+                    {item.isPopular && (
+                      <div className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
+                          <div className="absolute top-0 right-0">
+                              <span className="sr-only">Like</span>
+                          </div>
+                          <Heart size={16} className="text-red-500 fill-red-500" />
+                      </div>
+                    )}
                   </div>
-                  <h4 className="font-bold text-gray-800 text-sm leading-tight mb-1 line-clamp-2 h-10">{item.name}</h4>
-                  <p className="font-bold text-teal-600">${item.price}</p>
+
+                  <div className="flex flex-col flex-1">
+                    <h4 className="font-bold text-gray-900 text-base leading-tight mb-2">{item.name}</h4>
+                    
+                    <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-4">
+                        {item.description}
+                    </p>
+
+                    <div className="flex items-end justify-between mt-auto">
+                        <span className="text-lg font-bold text-gray-900">${item.price}</span>
+                        
+                        {/* Spiciness Indicators */}
+                        <div className="flex gap-0.5">
+                            {item.isSpicy && (
+                               <>
+                                 <Flame size={14} className="text-red-500 fill-red-500" />
+                                 <Flame size={14} className="text-red-300 fill-red-300" />
+                                 <Flame size={14} className="text-gray-200 fill-gray-200" />
+                               </>
+                            )}
+                        </div>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
