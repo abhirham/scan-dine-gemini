@@ -34,7 +34,7 @@ const CategoryPill: React.FC<{
     onClick={onClick}
     className={`flex flex-col items-center gap-2 min-w-[70px] transition-all duration-300 ${isActive ? 'opacity-100 transform scale-105' : 'opacity-60 hover:opacity-80'}`}
   >
-    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-1 transition-colors ${isActive ? 'bg-red-600 text-white shadow-red-200' : 'bg-white text-gray-600 border border-gray-100'}`}>
+    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-sm mb-1 transition-colors ${isActive ? 'bg-[#859F31] text-white shadow-[#859F31]/30' : 'bg-white text-gray-600 border border-gray-100'}`}>
       {icon}
     </div>
     <span className={`text-xs font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>{label}</span>
@@ -100,7 +100,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] text-gray-900 font-sans pb-24 selection:bg-red-100">
+    <div className="min-h-screen bg-[#F9FAFB] text-gray-900 font-sans pb-24 selection:bg-[#859F31]/20">
       
       {/* --- HOME SCREEN --- */}
       {!selectedItem && !isCartOpen && (
@@ -109,7 +109,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
           <header className="sticky top-0 z-10 bg-[#F9FAFB]/95 backdrop-blur-md px-6 py-4">
             <div className="flex justify-between items-center mb-4">
               <div className="flex flex-col">
-                <div className="flex items-center gap-1 text-red-600 font-bold text-sm">
+                <div className="flex items-center gap-1 text-[#859F31] font-bold text-sm">
                   <MapPin size={16} />
                   <span>Speedy Eats Natchez</span>
                 </div>
@@ -118,7 +118,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
               <button onClick={() => setIsCartOpen(true)} className="relative p-2 bg-white rounded-full shadow-sm">
                 <ShoppingBag size={22} className="text-gray-700" />
                 {cart.length > 0 && (
-                  <span className="absolute top-0 right-0 w-4 h-4 bg-red-600 text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
+                  <span className="absolute top-0 right-0 w-4 h-4 bg-[#859F31] text-white text-[10px] font-bold flex items-center justify-center rounded-full border-2 border-white">
                     {cart.length}
                   </span>
                 )}
@@ -131,7 +131,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
               <input 
                 type="text" 
                 placeholder="Search food" 
-                className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-4 text-sm shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-red-100 focus:outline-none"
+                className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-4 text-sm shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#859F31]/20 focus:outline-none"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -173,7 +173,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                           <div className="absolute top-0 right-0">
                               <span className="sr-only">Like</span>
                           </div>
-                          <Heart size={16} className="text-red-500 fill-red-500" />
+                          <Heart size={16} className="text-[#859F31] fill-[#859F31]" />
                       </div>
                     )}
                   </div>
@@ -188,7 +188,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
 
                     <div className="flex items-end justify-between mt-auto">
                         {/* Poppins Font for Price, styled like the reference - Semi Bold */}
-                        <span className="font-['Poppins'] text-xl font-semibold text-gray-900 flex items-baseline gap-0.5">
+                        <span className="font-['Poppins'] font-semibold text-xl text-gray-900 flex items-baseline gap-0.5">
                             <span className="text-sm align-top pt-0.5">$</span>{item.price}
                         </span>
                         
@@ -196,8 +196,8 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                         <div className="flex gap-0.5 mb-1">
                             {item.isSpicy && (
                                <>
-                                 <Flame size={14} className="text-red-500 fill-red-500" />
-                                 <Flame size={14} className="text-red-300 fill-red-300" />
+                                 <Flame size={14} className="text-orange-500 fill-orange-500" />
+                                 <Flame size={14} className="text-orange-300 fill-orange-300" />
                                  <Flame size={14} className="text-gray-200 fill-gray-200" />
                                </>
                             )}
@@ -224,7 +224,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
               <button 
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center gap-1 ${activeTab === tab.id ? 'text-red-600' : 'text-gray-400'}`}
+                className={`flex flex-col items-center gap-1 ${activeTab === tab.id ? 'text-[#859F31]' : 'text-gray-400'}`}
               >
                 {tab.icon}
                 <span className="text-[10px] font-medium">{tab.label}</span>
@@ -305,7 +305,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                     <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Allergens</h3>
                     <div className="flex flex-wrap gap-2">
                         {selectedItem.allergens.map(a => (
-                            <span key={a} className="px-3 py-1 bg-red-50 text-red-600 rounded-lg text-xs font-bold">{a}</span>
+                            <span key={a} className="px-3 py-1 bg-[#859F31]/10 text-[#859F31] rounded-lg text-xs font-bold">{a}</span>
                         ))}
                     </div>
                  </div>
@@ -316,7 +316,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
           <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6 safe-area-bottom">
             <button 
                 onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}
-                className="w-full bg-[#B91C1C] text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-red-600/20 hover:bg-red-700 transition-colors"
+                className="w-full bg-[#859F31] text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 hover:bg-[#6d8228] transition-colors"
             >
                 Add to Cart • ${selectedItem.price}
             </button>
@@ -339,7 +339,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
             <div className="px-6 py-6 pb-40">
                 {/* Location Card (Simulated Address) */}
                 <div className="flex items-center gap-4 mb-8">
-                    <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-red-600">
+                    <div className="w-10 h-10 rounded-full bg-[#859F31]/10 flex items-center justify-center text-[#859F31]">
                         <MapPin size={20} />
                     </div>
                     <div>
@@ -363,9 +363,9 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                                     <p className="font-semibold font-['Poppins'] text-teal-500 text-sm">${item.price}</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-2 py-1">
-                                    <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-red-600"><Minus size={14}/></button>
+                                    <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-[#859F31]"><Minus size={14}/></button>
                                     <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
-                                    <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-800 hover:text-red-600"><Plus size={14}/></button>
+                                    <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-800 hover:text-[#859F31]"><Plus size={14}/></button>
                                 </div>
                             </div>
                         ))
@@ -375,7 +375,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 {/* Add More Link */}
                 <div className="flex justify-between items-center py-4 border-t border-b border-gray-100 mb-8">
                     <span className="font-medium text-gray-900 text-sm">Need anything else?</span>
-                    <button onClick={() => setIsCartOpen(false)} className="text-red-600 font-bold text-sm hover:underline">+Add More</button>
+                    <button onClick={() => setIsCartOpen(false)} className="text-[#859F31] font-bold text-sm hover:underline">+Add More</button>
                 </div>
 
                 {/* Summary */}
@@ -401,7 +401,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                     <div className="border border-gray-200 rounded-2xl p-4 flex items-center gap-4">
                         <div className="w-10 h-6 bg-orange-500/20 rounded flex items-center justify-center">
                             <div className="flex -space-x-1">
-                                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
+                                <div className="w-3 h-3 rounded-full bg-[#859F31]/80"></div>
                                 <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
                             </div>
                         </div>
@@ -420,7 +420,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 <button 
                     onClick={handlePlaceOrder}
                     disabled={cart.length === 0}
-                    className="w-full bg-[#B91C1C] disabled:bg-gray-300 text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-red-600/20 hover:bg-red-700 transition-colors"
+                    className="w-full bg-[#859F31] disabled:bg-gray-300 text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 hover:bg-[#6d8228] transition-colors"
                 >
                     Checkout
                 </button>

@@ -46,9 +46,9 @@ export const SmartWaiter: React.FC = () => {
         onClick={() => setIsOpen(true)}
         className="fixed bottom-24 right-5 z-30 group"
       >
-        <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
+        <div className="absolute inset-0 bg-[#859F31] rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
         <div className="relative w-14 h-14 bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 border-2 border-white/20">
-            <Sparkles className="w-6 h-6 text-red-500 animate-pulse-soft" />
+            <Sparkles className="w-6 h-6 text-[#859F31] animate-pulse-soft" />
         </div>
       </button>
     );
@@ -60,7 +60,7 @@ export const SmartWaiter: React.FC = () => {
       <div className="bg-gray-900 p-5 flex justify-between items-center text-white relative overflow-hidden">
         <div className="flex items-center gap-3 relative z-10">
           <div className="w-10 h-10 bg-white/10 backdrop-blur rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6 text-red-500" />
+            <Bot className="w-6 h-6 text-[#859F31]" />
           </div>
           <div>
             <h3 className="font-bold text-lg leading-tight">AI Assistant</h3>
@@ -77,8 +77,8 @@ export const SmartWaiter: React.FC = () => {
         {messages.map((msg, idx) => (
           <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-gray-200' : 'bg-red-100'}`}>
-                {msg.role === 'user' ? <User size={14} className="text-gray-600" /> : <Sparkles size={14} className="text-red-600" />}
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-gray-200' : 'bg-[#859F31]/10'}`}>
+                {msg.role === 'user' ? <User size={14} className="text-gray-600" /> : <Sparkles size={14} className="text-[#859F31]" />}
               </div>
               <div className={`p-3.5 rounded-2xl text-sm leading-relaxed shadow-sm ${
                 msg.role === 'user' 
@@ -94,9 +94,9 @@ export const SmartWaiter: React.FC = () => {
           <div className="flex justify-start">
             <div className="bg-white px-4 py-3 rounded-2xl rounded-tl-none border border-gray-100 shadow-sm flex gap-1.5 items-center">
               <span className="text-xs text-gray-400 font-medium mr-2">Thinking</span>
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce"></span>
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce delay-100"></span>
-              <span className="w-1.5 h-1.5 bg-red-500 rounded-full animate-bounce delay-200"></span>
+              <span className="w-1.5 h-1.5 bg-[#859F31] rounded-full animate-bounce"></span>
+              <span className="w-1.5 h-1.5 bg-[#859F31] rounded-full animate-bounce delay-100"></span>
+              <span className="w-1.5 h-1.5 bg-[#859F31] rounded-full animate-bounce delay-200"></span>
             </div>
           </div>
         )}
@@ -111,12 +111,12 @@ export const SmartWaiter: React.FC = () => {
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleSend()}
           placeholder="Ask for recommendations..."
-          className="flex-1 px-5 py-3 bg-gray-50 border-none rounded-xl focus:outline-none focus:ring-2 focus:ring-red-100 text-sm text-gray-900 placeholder-gray-400"
+          className="flex-1 px-5 py-3 bg-gray-50 border-none rounded-xl focus:outline-none focus:ring-2 focus:ring-[#859F31]/20 text-sm text-gray-900 placeholder-gray-400"
         />
         <button 
           onClick={handleSend}
           disabled={!query.trim() || isLoading}
-          className="w-12 h-12 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-red-200 transition-all"
+          className="w-12 h-12 bg-[#859F31] text-white rounded-xl hover:bg-[#6d8228] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-lg shadow-[#859F31]/30 transition-all"
         >
           <Send className="w-5 h-5 ml-0.5" />
         </button>
