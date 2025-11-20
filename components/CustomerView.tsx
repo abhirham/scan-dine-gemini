@@ -23,7 +23,7 @@ interface CustomerViewProps {
   tableId: number;
 }
 
-// Helper components for the specific design feel
+// Helper components
 const CategoryPill: React.FC<{ 
   label: string; 
   icon: React.ReactNode; 
@@ -39,6 +39,55 @@ const CategoryPill: React.FC<{
     </div>
     <span className={`text-xs font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>{label}</span>
   </button>
+);
+
+const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number }> = ({ item, onClick, idx }) => (
+  <div 
+    onClick={onClick}
+    className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-col h-full"
+    style={{ animationDelay: `${idx * 50}ms` }}
+  >
+    <div className="relative w-full aspect-[4/3] mb-4">
+      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
+      
+      {/* Heart Icon (top right) - Only for Popular Items */}
+      {item.isPopular && (
+        <div className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
+            <div className="absolute top-0 right-0">
+                <span className="sr-only">Like</span>
+            </div>
+            <Heart size={16} className="text-[#859F31] fill-[#859F31]" />
+        </div>
+      )}
+    </div>
+
+    <div className="flex flex-col flex-1">
+      {/* Poppins Font for Name - Semi Bold */}
+      <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
+      
+      <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-4">
+          {item.description}
+      </p>
+
+      <div className="flex items-end justify-between mt-auto">
+          {/* Poppins Font for Price, styled like the reference - Semi Bold */}
+          <span className="font-['Poppins'] font-semibold text-xl text-gray-900 flex items-baseline gap-0.5">
+              <span className="text-sm align-top pt-0.5">$</span>{item.price}
+          </span>
+          
+          {/* Spiciness Indicators */}
+          <div className="flex gap-0.5 mb-1">
+              {item.isSpicy && (
+                  <>
+                    <Flame size={14} className="text-orange-500 fill-orange-500" />
+                    <Flame size={14} className="text-orange-300 fill-orange-300" />
+                    <Flame size={14} className="text-gray-200 fill-gray-200" />
+                  </>
+              )}
+          </div>
+      </div>
+    </div>
+  </div>
 );
 
 export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
@@ -131,86 +180,94 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
               <input 
                 type="text" 
                 placeholder="Search food" 
-                className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-4 text-sm shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#859F31]/20 focus:outline-none"
+                className="w-full bg-white border-none rounded-2xl py-4 pl-12 pr-12 text-sm shadow-sm placeholder-gray-400 focus:ring-2 focus:ring-[#859F31]/20 focus:outline-none"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+              {searchTerm && (
+                <button 
+                  onClick={() => setSearchTerm('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+                >
+                  <X size={18} />
+                </button>
+              )}
             </div>
           </header>
 
-          {/* Categories */}
-          <div className="px-6 mb-6 overflow-x-auto hide-scrollbar">
-            <div className="flex gap-4 min-w-max pb-2 pt-1">
-              {categories.map(cat => (
-                <CategoryPill 
-                  key={cat.id}
-                  label={cat.label}
-                  icon={cat.icon}
-                  isActive={activeCategory === cat.id}
-                  onClick={() => setActiveCategory(cat.id)}
-                />
-              ))}
+          {/* Categories - Hide when searching */}
+          {!searchTerm && (
+            <div className="px-6 mb-6 overflow-x-auto hide-scrollbar">
+              <div className="flex gap-4 min-w-max pb-2 pt-1">
+                {categories.map(cat => (
+                  <CategoryPill 
+                    key={cat.id}
+                    label={cat.label}
+                    icon={cat.icon}
+                    isActive={activeCategory === cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Menu Grid */}
           <div className="px-6 pb-6">
-            <h3 className="text-xl font-bold mb-4 font-['Poppins']">{activeCategory}</h3>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-              {filteredMenu.map((item, idx) => (
-                <div 
-                  key={item.id} 
-                  onClick={() => setSelectedItem(item)}
-                  className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-col h-full"
-                  style={{ animationDelay: `${idx * 50}ms` }}
-                >
-                  <div className="relative w-full aspect-[4/3] mb-4">
-                    <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
-                    
-                    {/* Heart Icon (top right) - Only for Popular Items */}
-                    {item.isPopular && (
-                      <div className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
-                          <div className="absolute top-0 right-0">
-                              <span className="sr-only">Like</span>
-                          </div>
-                          <Heart size={16} className="text-[#859F31] fill-[#859F31]" />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col flex-1">
-                    {/* Poppins Font for Name - Semi Bold */}
-                    <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
-                    
-                    <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-4">
-                        {item.description}
-                    </p>
-
-                    <div className="flex items-end justify-between mt-auto">
-                        {/* Poppins Font for Price, styled like the reference - Semi Bold */}
-                        <span className="font-['Poppins'] font-semibold text-xl text-gray-900 flex items-baseline gap-0.5">
-                            <span className="text-sm align-top pt-0.5">$</span>{item.price}
-                        </span>
+            {searchTerm ? (
+                // Search Mode: Group results by category
+                <>
+                    {categories.map(cat => {
+                        const catItems = menu.filter(item => 
+                            item.category === cat.id && 
+                            item.name.toLowerCase().includes(searchTerm.toLowerCase())
+                        );
                         
-                        {/* Spiciness Indicators */}
-                        <div className="flex gap-0.5 mb-1">
-                            {item.isSpicy && (
-                               <>
-                                 <Flame size={14} className="text-orange-500 fill-orange-500" />
-                                 <Flame size={14} className="text-orange-300 fill-orange-300" />
-                                 <Flame size={14} className="text-gray-200 fill-gray-200" />
-                               </>
-                            )}
+                        if (catItems.length === 0) return null;
+
+                        return (
+                            <div key={cat.id} className="mb-8">
+                                <h3 className="text-xl font-bold mb-4 font-['Poppins']">{cat.label}</h3>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                                    {catItems.map((item, idx) => (
+                                        <MenuItemCard 
+                                            key={item.id} 
+                                            item={item} 
+                                            onClick={() => setSelectedItem(item)} 
+                                            idx={idx} 
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })}
+                    {/* Empty Search State */}
+                    {menu.filter(item => item.name.toLowerCase().includes(searchTerm.toLowerCase())).length === 0 && (
+                        <div className="text-center py-12 text-gray-400">
+                            <p>No items found matching "{searchTerm}".</p>
                         </div>
+                    )}
+                </>
+            ) : (
+                // Standard Category Mode
+                <>
+                    <h3 className="text-xl font-bold mb-4 font-['Poppins']">{activeCategory}</h3>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                    {filteredMenu.map((item, idx) => (
+                        <MenuItemCard 
+                            key={item.id} 
+                            item={item} 
+                            onClick={() => setSelectedItem(item)} 
+                            idx={idx} 
+                        />
+                    ))}
                     </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            {filteredMenu.length === 0 && (
-                <div className="text-center py-12 text-gray-400">
-                    <p>No items found in this category.</p>
-                </div>
+                    {filteredMenu.length === 0 && (
+                        <div className="text-center py-12 text-gray-400">
+                            <p>No items found in this category.</p>
+                        </div>
+                    )}
+                </>
             )}
           </div>
 
