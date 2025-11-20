@@ -44,7 +44,7 @@ export const SmartWaiter: React.FC = () => {
     return (
       <button 
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-5 z-30 group"
+        className="fixed bottom-6 right-5 z-30 group"
       >
         <div className="absolute inset-0 bg-[#859F31] rounded-full animate-ping opacity-20 group-hover:opacity-40"></div>
         <div className="relative w-14 h-14 bg-gray-900 text-white rounded-full shadow-xl flex items-center justify-center transition-transform hover:scale-110 border-2 border-white/20">
@@ -55,7 +55,7 @@ export const SmartWaiter: React.FC = () => {
   }
 
   return (
-    <div className="fixed bottom-20 right-5 w-[90vw] md:w-96 bg-white rounded-[2rem] shadow-2xl shadow-gray-900/20 border border-gray-100 flex flex-col z-50 overflow-hidden h-[500px] animate-slide-up">
+    <div className="fixed bottom-4 right-5 w-[90vw] md:w-96 bg-white rounded-[2rem] shadow-2xl shadow-gray-900/20 border border-gray-100 flex flex-col z-50 overflow-hidden h-[500px] animate-slide-up">
       {/* Header */}
       <div className="bg-gray-900 p-5 flex justify-between items-center text-white relative overflow-hidden">
         <div className="flex items-center gap-3 relative z-10">

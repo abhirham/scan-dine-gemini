@@ -8,8 +8,6 @@ import {
   Minus, 
   X, 
   MapPin, 
-  FileText, 
-  User, 
   Utensils, 
   Coffee, 
   Sandwich, 
@@ -97,7 +95,6 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [activeTab, setActiveTab] = useState('Menus');
 
   // Cart Logic
   const addToCart = (item: MenuItem, qty: number = 1) => {
@@ -149,7 +146,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB] text-gray-900 font-sans pb-24 selection:bg-[#859F31]/20">
+    <div className="min-h-screen bg-[#F9FAFB] text-gray-900 font-sans pb-6 selection:bg-[#859F31]/20">
       
       {/* --- HOME SCREEN --- */}
       {!selectedItem && !isCartOpen && (
@@ -269,24 +266,6 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                     )}
                 </>
             )}
-          </div>
-
-          {/* Bottom Nav */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-6 py-3 flex justify-between items-center z-40 safe-area-bottom">
-            {[
-              { id: 'Menus', icon: <Utensils size={24} />, label: 'Menus' },
-              { id: 'Orders', icon: <FileText size={24} />, label: 'Orders' },
-              { id: 'Account', icon: <User size={24} />, label: 'Account' },
-            ].map(tab => (
-              <button 
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex flex-col items-center gap-1 ${activeTab === tab.id ? 'text-[#859F31]' : 'text-gray-400'}`}
-              >
-                {tab.icon}
-                <span className="text-[10px] font-medium">{tab.label}</span>
-              </button>
-            ))}
           </div>
         </div>
       )}
