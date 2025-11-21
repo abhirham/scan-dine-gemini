@@ -19,6 +19,11 @@ import {
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
+// Local interface to handle raw input for options string
+interface EditableModificationGroup extends ModificationGroup {
+  rawOptions?: string;
+}
+
 export const AdminView: React.FC = () => {
   const { 
     orders, 
@@ -49,7 +54,7 @@ export const AdminView: React.FC = () => {
     isPopular: false
   };
   const [formData, setFormData] = useState(initialFormState);
-  const [modifications, setModifications] = useState<ModificationGroup[]>([]);
+  const [modifications, setModifications] = useState<EditableModificationGroup[]>([]);
 
   const openAddModal = () => {
     setEditingItem(null);
@@ -70,7 +75,11 @@ export const AdminView: React.FC = () => {
         isVegetarian: !!item.isVegetarian,
         isPopular: !!item.isPopular
     });
-    setModifications(item.modifications ? [...item.modifications] : []);
+    // Initialize rawOptions for smoother editing
+    setModifications(item.modifications ? item.modifications.map(m => ({
+        ...m,
+        rawOptions: m.options.join(', ')
+    })) : []);
     setIsMenuModalOpen(true);
   };
 
@@ -94,21 +103,26 @@ export const AdminView: React.FC = () => {
         id: Math.random().toString(36).substr(2, 9),
         name: '',
         options: [],
+        rawOptions: '',
         required: false,
         multiSelect: false
       }
     ]);
   };
 
-  const updateModificationGroup = (index: number, field: keyof ModificationGroup, value: any) => {
+  const updateModificationGroup = (index: number, field: keyof EditableModificationGroup, value: any) => {
     const newMods = [...modifications];
     newMods[index] = { ...newMods[index], [field]: value };
     setModifications(newMods);
   };
 
-  const updateModificationOptions = (index: number, optionsString: string) => {
-    const options = optionsString.split(',').map(s => s.trim()).filter(s => s.length > 0);
-    updateModificationGroup(index, 'options', options);
+  const updateModificationOptions = (index: number, value: string) => {
+    const newMods = [...modifications];
+    // Update the raw string for the input display
+    newMods[index].rawOptions = value;
+    // Update the actual array for the data model (parse logic)
+    newMods[index].options = value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    setModifications(newMods);
   };
 
   const removeModificationGroup = (index: number) => {
@@ -117,6 +131,16 @@ export const AdminView: React.FC = () => {
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Clean up modifications before saving (remove rawOptions)
+    const cleanModifications: ModificationGroup[] = modifications.map(m => ({
+        id: m.id,
+        name: m.name,
+        options: m.options,
+        required: m.required,
+        multiSelect: m.multiSelect
+    }));
+
     const itemData = {
         name: formData.name,
         description: formData.description,
@@ -132,7 +156,7 @@ export const AdminView: React.FC = () => {
         sugar: editingItem?.sugar || '0g', 
         ingredients: editingItem?.ingredients || [], 
         allergens: editingItem?.allergens || [],
-        modifications: modifications
+        modifications: cleanModifications
     };
 
     if (editingItem) {
@@ -624,7 +648,8 @@ export const AdminView: React.FC = () => {
                                                 <label className="block text-xs text-gray-500 mb-1">Options (Comma separated)</label>
                                                 <input 
                                                     type="text" 
-                                                    value={group.options.join(', ')}
+                                                    // Use rawOptions if available for smooth typing, fall back to array join for initial display
+                                                    value={group.rawOptions ?? group.options.join(', ')}
                                                     onChange={(e) => updateModificationOptions(idx, e.target.value)}
                                                     className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-500 text-gray-900"
                                                     placeholder="Option 1, Option 2..."
