@@ -12,11 +12,15 @@ interface RestaurantContextType {
   resolveServiceRequest: (requestId: string) => void;
   processRefund: (orderId: string) => void;
   processPayment: (orderId: string) => void;
+  addMenuItem: (item: Omit<MenuItem, 'id'>) => void;
+  updateMenuItem: (item: MenuItem) => void;
+  deleteMenuItem: (id: string) => void;
 }
 
 const RestaurantContext = createContext<RestaurantContextType | undefined>(undefined);
 
 export const RestaurantProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [menu, setMenu] = useState<MenuItem[]>(MENU_ITEMS);
   const [orders, setOrders] = useState<Order[]>([]);
   const [serviceRequests, setServiceRequests] = useState<ServiceRequest[]>([]);
 
@@ -65,9 +69,22 @@ export const RestaurantProvider: React.FC<{ children: ReactNode }> = ({ children
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: OrderStatus.PAID } : o));
   }, []);
 
+  const addMenuItem = useCallback((item: Omit<MenuItem, 'id'>) => {
+    const newItem: MenuItem = { ...item, id: Math.random().toString(36).substr(2, 9) };
+    setMenu(prev => [...prev, newItem]);
+  }, []);
+
+  const updateMenuItem = useCallback((item: MenuItem) => {
+    setMenu(prev => prev.map(i => i.id === item.id ? item : i));
+  }, []);
+
+  const deleteMenuItem = useCallback((id: string) => {
+    setMenu(prev => prev.filter(i => i.id !== id));
+  }, []);
+
   return (
     <RestaurantContext.Provider value={{
-      menu: MENU_ITEMS,
+      menu,
       orders,
       serviceRequests,
       placeOrder,
@@ -75,7 +92,10 @@ export const RestaurantProvider: React.FC<{ children: ReactNode }> = ({ children
       requestService,
       resolveServiceRequest,
       processRefund,
-      processPayment
+      processPayment,
+      addMenuItem,
+      updateMenuItem,
+      deleteMenuItem
     }}>
       {children}
     </RestaurantContext.Provider>

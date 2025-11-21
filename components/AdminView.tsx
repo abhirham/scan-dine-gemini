@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRestaurant } from '../context/RestaurantContext';
-import { OrderStatus } from '../types';
+import { OrderStatus, MenuItem } from '../types';
 import { 
   LayoutDashboard, 
   DollarSign, 
@@ -8,13 +8,96 @@ import {
   RefreshCcw, 
   CheckCircle, 
   Users,
-  Coffee
+  Coffee,
+  BookOpen,
+  Plus,
+  Edit,
+  Trash2,
+  X,
+  Save
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
 export const AdminView: React.FC = () => {
-  const { orders, serviceRequests, resolveServiceRequest, processRefund, processPayment } = useRestaurant();
-  const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'requests'>('overview');
+  const { 
+    orders, 
+    serviceRequests, 
+    resolveServiceRequest, 
+    processRefund, 
+    processPayment,
+    menu,
+    addMenuItem,
+    updateMenuItem,
+    deleteMenuItem
+  } = useRestaurant();
+  
+  const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'requests' | 'menu'>('overview');
+  const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+
+  // Form State
+  const initialFormState = {
+    name: '',
+    description: '',
+    price: '',
+    category: 'Entrees',
+    image: '',
+    calories: '',
+    isSpicy: false,
+    isVegetarian: false,
+    isPopular: false
+  };
+  const [formData, setFormData] = useState(initialFormState);
+
+  const openAddModal = () => {
+    setEditingItem(null);
+    setFormData(initialFormState);
+    setIsMenuModalOpen(true);
+  };
+
+  const openEditModal = (item: MenuItem) => {
+    setEditingItem(item);
+    setFormData({
+        name: item.name,
+        description: item.description,
+        price: item.price.toString(),
+        category: item.category,
+        image: item.image,
+        calories: item.calories ? item.calories.toString() : '',
+        isSpicy: !!item.isSpicy,
+        isVegetarian: !!item.isVegetarian,
+        isPopular: !!item.isPopular
+    });
+    setIsMenuModalOpen(true);
+  };
+
+  const handleSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    const itemData = {
+        name: formData.name,
+        description: formData.description,
+        price: parseFloat(formData.price) || 0,
+        category: formData.category as any,
+        image: formData.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80',
+        calories: parseInt(formData.calories) || 0,
+        isSpicy: formData.isSpicy,
+        isVegetarian: formData.isVegetarian,
+        isPopular: formData.isPopular,
+        protein: editingItem?.protein || '0g', 
+        fats: editingItem?.fats || '0g', 
+        carbs: editingItem?.carbs || '0g', 
+        sugar: editingItem?.sugar || '0g', 
+        ingredients: editingItem?.ingredients || [], 
+        allergens: editingItem?.allergens || []
+    };
+
+    if (editingItem) {
+        updateMenuItem({ ...editingItem, ...itemData });
+    } else {
+        addMenuItem(itemData);
+    }
+    setIsMenuModalOpen(false);
+  };
 
   // Derived Metrics
   const totalRevenue = orders
@@ -31,7 +114,7 @@ export const AdminView: React.FC = () => {
       .map(o => o.tableId)
   ).size;
 
-  // Simple Chart Data (Revenue by Table for example)
+  // Simple Chart Data
   const revenueByTable = orders
     .filter(o => o.status === OrderStatus.PAID)
     .reduce((acc, o) => {
@@ -84,11 +167,17 @@ export const AdminView: React.FC = () => {
                 </div>
                  Service Requests
             </button>
+            <button 
+                onClick={() => setActiveTab('menu')}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'menu' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
+            >
+                <BookOpen size={20} /> Menu Management
+            </button>
         </nav>
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto relative">
         <div className="p-8">
           
           {/* Header Stats */}
@@ -240,7 +329,196 @@ export const AdminView: React.FC = () => {
              </div>
           )}
 
+          {activeTab === 'menu' && (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+                    <h2 className="text-lg font-bold text-gray-800">Menu Items</h2>
+                    <button 
+                        onClick={openAddModal}
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        <Plus size={18} /> Add Item
+                    </button>
+                </div>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                        <thead>
+                            <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider border-b border-gray-100">
+                                <th className="p-4">Item</th>
+                                <th className="p-4">Category</th>
+                                <th className="p-4">Price</th>
+                                <th className="p-4">Status</th>
+                                <th className="p-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100">
+                            {menu.map(item => (
+                                <tr key={item.id} className="hover:bg-gray-50 transition-colors">
+                                    <td className="p-4 flex items-center gap-4">
+                                        <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover bg-gray-200" />
+                                        <div>
+                                            <div className="font-bold text-gray-900">{item.name}</div>
+                                            <div className="text-xs text-gray-500 max-w-[200px] truncate">{item.description}</div>
+                                        </div>
+                                    </td>
+                                    <td className="p-4">
+                                        <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-bold">{item.category}</span>
+                                    </td>
+                                    <td className="p-4 font-mono font-medium text-gray-700">
+                                        ${item.price.toFixed(2)}
+                                    </td>
+                                    <td className="p-4">
+                                        <div className="flex gap-1">
+                                            {item.isPopular && <span className="w-2 h-2 bg-red-500 rounded-full" title="Popular"></span>}
+                                            {item.isVegetarian && <span className="w-2 h-2 bg-green-500 rounded-full" title="Vegetarian"></span>}
+                                            {item.isSpicy && <span className="w-2 h-2 bg-orange-500 rounded-full" title="Spicy"></span>}
+                                        </div>
+                                    </td>
+                                    <td className="p-4 text-right">
+                                        <div className="flex items-center justify-end gap-2">
+                                            <button onClick={() => openEditModal(item)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">
+                                                <Edit size={18} />
+                                            </button>
+                                            <button onClick={() => { if(window.confirm('Delete item?')) deleteMenuItem(item.id) }} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+          )}
+
         </div>
+
+        {/* Menu Modal */}
+        {isMenuModalOpen && (
+            <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+                <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
+                        <h2 className="text-xl font-bold text-gray-900">{editingItem ? 'Edit Item' : 'Add New Item'}</h2>
+                        <button onClick={() => setIsMenuModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                            <X size={20} />
+                        </button>
+                    </div>
+                    
+                    <form onSubmit={handleSave} className="p-6 space-y-5">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                            <input 
+                                type="text" 
+                                required
+                                value={formData.name}
+                                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                            />
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+                                <input 
+                                    type="number" 
+                                    required
+                                    step="0.01"
+                                    value={formData.price}
+                                    onChange={(e) => setFormData({...formData, price: e.target.value})}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <select 
+                                    value={formData.category}
+                                    onChange={(e) => setFormData({...formData, category: e.target.value})}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                                >
+                                    <option value="Entrees">Entrees</option>
+                                    <option value="Grab & Go">Grab & Go</option>
+                                    <option value="Drinks">Drinks</option>
+                                    <option value="Snacks">Snacks</option>
+                                    <option value="Extras">Extras</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <textarea 
+                                required
+                                rows={3}
+                                value={formData.description}
+                                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Image URL</label>
+                            <input 
+                                type="url" 
+                                placeholder="https://..."
+                                value={formData.image}
+                                onChange={(e) => setFormData({...formData, image: e.target.value})}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                            />
+                        </div>
+
+                        <div className="flex gap-6">
+                             <label className="flex items-center gap-2 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.isPopular}
+                                    onChange={(e) => setFormData({...formData, isPopular: e.target.checked})}
+                                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 bg-white"
+                                />
+                                <span className="text-sm text-gray-700">Popular</span>
+                            </label>
+                             <label className="flex items-center gap-2 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.isSpicy}
+                                    onChange={(e) => setFormData({...formData, isSpicy: e.target.checked})}
+                                    className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500 bg-white"
+                                />
+                                <span className="text-sm text-gray-700">Spicy</span>
+                            </label>
+                             <label className="flex items-center gap-2 cursor-pointer">
+                                <input 
+                                    type="checkbox" 
+                                    checked={formData.isVegetarian}
+                                    onChange={(e) => setFormData({...formData, isVegetarian: e.target.checked})}
+                                    className="w-4 h-4 text-green-600 rounded focus:ring-green-500 bg-white"
+                                />
+                                <span className="text-sm text-gray-700">Vegetarian</span>
+                            </label>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Calories (kcal)</label>
+                            <input 
+                                type="number" 
+                                value={formData.calories}
+                                onChange={(e) => setFormData({...formData, calories: e.target.value})}
+                                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
+                            />
+                        </div>
+
+                        <div className="pt-4">
+                            <button 
+                                type="submit"
+                                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2"
+                            >
+                                <Save size={20} /> Save Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        )}
       </main>
     </div>
   );
