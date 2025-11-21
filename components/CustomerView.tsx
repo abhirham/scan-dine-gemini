@@ -42,32 +42,20 @@ const CategoryPill: React.FC<{
 const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number }> = ({ item, onClick, idx }) => (
   <div 
     onClick={onClick}
-    className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-col h-full"
+    className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-row gap-4 h-full items-stretch"
     style={{ animationDelay: `${idx * 50}ms` }}
   >
-    <div className="relative w-full aspect-[4/3] mb-4">
-      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
-      
-      {/* Heart Icon (top right) - Only for Popular Items */}
-      {item.isPopular && (
-        <div className="absolute top-3 right-3 flex items-center justify-center w-8 h-8 bg-white rounded-full shadow-sm">
-            <div className="absolute top-0 right-0">
-                <span className="sr-only">Like</span>
-            </div>
-            <Heart size={16} className="text-[#859F31] fill-[#859F31]" />
-        </div>
-      )}
-    </div>
+    {/* Text Section (Left) */}
+    <div className="flex flex-col flex-1 justify-between py-1">
+      <div>
+        <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
+        
+        <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-2">
+            {item.description}
+        </p>
+      </div>
 
-    <div className="flex flex-col flex-1">
-      {/* Poppins Font for Name - Semi Bold */}
-      <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
-      
-      <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-4">
-          {item.description}
-      </p>
-
-      <div className="flex items-end justify-between mt-auto">
+      <div className="flex items-center gap-3 mt-auto">
           {/* Poppins Font for Price, styled like the reference - Semi Bold */}
           <span className="font-['Poppins'] font-semibold text-xl text-gray-900 flex items-baseline gap-0.5">
               <span className="text-sm align-top pt-0.5">$</span>{item.price}
@@ -84,6 +72,21 @@ const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number 
               )}
           </div>
       </div>
+    </div>
+
+    {/* Image Section (Right) */}
+    <div className="relative w-32 h-32 shrink-0">
+      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
+      
+      {/* Heart Icon (top right inside image) - Only for Popular Items */}
+      {item.isPopular && (
+        <div className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-white rounded-full shadow-sm">
+            <div className="absolute top-0 right-0">
+                <span className="sr-only">Like</span>
+            </div>
+            <Heart size={14} className="text-[#859F31] fill-[#859F31]" />
+        </div>
+      )}
     </div>
   </div>
 );
@@ -225,7 +228,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                         return (
                             <div key={cat.id} className="mb-8">
                                 <h3 className="text-xl font-bold mb-4 font-['Poppins']">{cat.label}</h3>
-                                <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                                <div className="flex flex-col gap-4">
                                     {catItems.map((item, idx) => (
                                         <MenuItemCard 
                                             key={item.id} 
@@ -249,7 +252,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 // Standard Category Mode
                 <>
                     <h3 className="text-xl font-bold mb-4 font-['Poppins']">{activeCategory}</h3>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-6">
+                    <div className="flex flex-col gap-4">
                     {filteredMenu.map((item, idx) => (
                         <MenuItemCard 
                             key={item.id} 
