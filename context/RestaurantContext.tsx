@@ -32,7 +32,8 @@ export const RestaurantProvider: React.FC<{ children: ReactNode }> = ({ children
         menuItemId: item.id,
         name: item.name,
         quantity: item.quantity,
-        price: item.price
+        price: item.price,
+        selectedModifications: item.selectedModifications
       })),
       totalAmount: cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
       status: OrderStatus.PENDING,

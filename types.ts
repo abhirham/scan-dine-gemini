@@ -13,6 +13,14 @@ export enum Role {
   ADMIN = 'ADMIN'
 }
 
+export interface ModificationGroup {
+  id: string;
+  name: string; // e.g., "Spice Level", "Remove Ingredients"
+  options: string[]; // e.g., ["Mild", "Medium", "Hot"]
+  required: boolean; // If true, user must select at least one
+  multiSelect: boolean; // If true, checkboxes. If false, radio buttons.
+}
+
 export interface MenuItem {
   id: string;
   name: string;
@@ -23,17 +31,18 @@ export interface MenuItem {
   isVegetarian?: boolean;
   isSpicy?: boolean;
   isPopular?: boolean;
-  calories?: number;
   protein?: string;
   fats?: string;
   carbs?: string;
   sugar?: string;
   ingredients?: string[];
   allergens?: string[];
+  modifications?: ModificationGroup[];
 }
 
 export interface CartItem extends MenuItem {
   quantity: number;
+  selectedModifications: Record<string, string[]>; // key is Group Name, value is array of selected options
 }
 
 export interface OrderItem {
@@ -41,6 +50,7 @@ export interface OrderItem {
   name: string;
   quantity: number;
   price: number;
+  selectedModifications?: Record<string, string[]>;
 }
 
 export interface Order {

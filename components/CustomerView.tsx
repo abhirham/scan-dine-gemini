@@ -13,7 +13,8 @@ import {
   Sandwich, 
   Cookie, 
   Heart,
-  Flame
+  Flame,
+  CheckCircle
 } from 'lucide-react';
 import { SmartWaiter } from './ui/SmartWaiter';
 
@@ -97,22 +98,49 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  
+  // Modifications State for currently selected item
+  const [currentModifications, setCurrentModifications] = useState<Record<string, string[]>>({});
 
-  // Cart Logic
-  const addToCart = (item: MenuItem, qty: number = 1) => {
-    setCart(prev => {
-      const existing = prev.find(i => i.id === item.id);
-      if (existing) {
-        return prev.map(i => i.id === item.id ? { ...i, quantity: i.quantity + qty } : i);
-      }
-      return [...prev, { ...item, quantity: qty }];
-    });
+  const resetSelection = () => {
+    setSelectedItem(null);
+    setCurrentModifications({});
   };
 
-  const updateQuantity = (itemId: string, delta: number) => {
+  // Cart Logic
+  const addToCart = () => {
+    if (!selectedItem) return;
+    
+    // Construct the cart item
+    const newItem: CartItem = {
+        ...selectedItem,
+        quantity: 1,
+        selectedModifications: currentModifications
+    };
+
     setCart(prev => {
-      return prev.map(item => {
-        if (item.id === itemId) {
+      // Simple check: if same item ID AND same modifications, increment qty. 
+      // Otherwise add as new line item.
+      // Deep comparison of mods is tricky, for MVP we can just add as new line item or simple stringify check
+      const existingIdx = prev.findIndex(i => 
+          i.id === newItem.id && 
+          JSON.stringify(i.selectedModifications) === JSON.stringify(newItem.selectedModifications)
+      );
+
+      if (existingIdx > -1) {
+        const newCart = [...prev];
+        newCart[existingIdx].quantity += 1;
+        return newCart;
+      }
+      return [...prev, newItem];
+    });
+    resetSelection();
+  };
+
+  const updateQuantity = (cartIdx: number, delta: number) => {
+    setCart(prev => {
+      return prev.map((item, idx) => {
+        if (idx === cartIdx) {
           return { ...item, quantity: Math.max(0, item.quantity + delta) };
         }
         return item;
@@ -129,7 +157,6 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
     placeOrder(tableId, cart);
     setCart([]);
     setIsCartOpen(false);
-    // In a real app, show success state
   };
 
   // Filtering
@@ -146,6 +173,39 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
     { id: 'Snacks', label: 'Snacks', icon: <Cookie size={20} /> },
     { id: 'Extras', label: 'Extras', icon: <Plus size={20} /> },
   ];
+
+  // Modification Handlers
+  const toggleModification = (groupName: string, option: string, multiSelect: boolean) => {
+    setCurrentModifications(prev => {
+        const currentOptions = prev[groupName] || [];
+        if (multiSelect) {
+            // Toggle Checkbox
+            if (currentOptions.includes(option)) {
+                return { ...prev, [groupName]: currentOptions.filter(o => o !== option) };
+            } else {
+                return { ...prev, [groupName]: [...currentOptions, option] };
+            }
+        } else {
+            // Radio selection
+            return { ...prev, [groupName]: [option] };
+        }
+    });
+  };
+
+  const isModificationValid = useMemo(() => {
+    if (!selectedItem || !selectedItem.modifications) return true;
+    
+    // Check if all required groups have at least one selection
+    for (const group of selectedItem.modifications) {
+        if (group.required) {
+            const selections = currentModifications[group.name];
+            if (!selections || selections.length === 0) {
+                return false;
+            }
+        }
+    }
+    return true;
+  }, [selectedItem, currentModifications]);
 
   return (
     <div className="min-h-screen bg-[#F9FAFB] text-gray-900 font-sans pb-6 selection:bg-[#859F31]/20">
@@ -282,51 +342,60 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 <div className="relative h-72 w-full bg-gray-100">
                     <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
                     <button 
-                        onClick={() => setSelectedItem(null)}
+                        onClick={resetSelection}
                         className="absolute top-4 left-4 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-800 shadow-sm hover:bg-white"
                     >
                         <X size={20} />
                     </button>
-                    {/* Pagination dots simulation */}
-                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                        <div className="w-2 h-2 bg-white rounded-full"></div>
-                        <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                        <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                    </div>
                 </div>
 
-                <div className="px-6 py-6">
+                <div className="px-6 py-6 pb-32">
                     <div className="flex justify-between items-start mb-6">
                         <h1 className="text-2xl font-['Poppins'] font-semibold text-gray-900 w-3/4 leading-tight">{selectedItem.name}</h1>
-                        {/* UPDATED PRICE COLOR */}
                         <span className="text-2xl font-['Poppins'] font-semibold text-[#859F31]">${selectedItem.price}</span>
                     </div>
+                    
+                    <p className="text-gray-500 mb-8 leading-relaxed">{selectedItem.description}</p>
 
-                    {/* Nutrition Summary */}
-                    <div className="mb-8">
-                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Nutrition Summary</h3>
-                        <div className="bg-gray-50 rounded-2xl p-4 flex justify-between border border-gray-100">
-                            <div className="flex flex-col items-center">
-                                <span className="text-xs text-gray-400 mb-1">Calories</span>
-                                <span className="font-bold text-gray-900">{selectedItem.calories || 350}g</span>
-                            </div>
-                            <div className="w-px bg-gray-200"></div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-xs text-gray-400 mb-1">Protein</span>
-                                <span className="font-bold text-gray-900">{selectedItem.protein || '20g'}</span>
-                            </div>
-                            <div className="w-px bg-gray-200"></div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-xs text-gray-400 mb-1">Fats</span>
-                                <span className="font-bold text-gray-900">{selectedItem.fats || '10g'}</span>
-                            </div>
-                            <div className="w-px bg-gray-200"></div>
-                            <div className="flex flex-col items-center">
-                                <span className="text-xs text-gray-400 mb-1">Carbs</span>
-                                <span className="font-bold text-gray-900">{selectedItem.carbs || '45g'}</span>
-                            </div>
+                    {/* Modifications Section */}
+                    {selectedItem.modifications && selectedItem.modifications.length > 0 && (
+                        <div className="space-y-6 mb-8">
+                             <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Customize Your Order</h3>
+                            {selectedItem.modifications.map(group => (
+                                <div key={group.id} className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
+                                    <div className="flex justify-between items-center mb-3">
+                                        <h4 className="font-bold text-gray-900">
+                                            {group.name}
+                                            {group.required && <span className="text-[#859F31] ml-1">*</span>}
+                                        </h4>
+                                        <span className="text-xs text-gray-400 font-medium">
+                                            {group.required ? 'Required' : 'Optional'} • {group.multiSelect ? 'Choose multiple' : 'Select one'}
+                                        </span>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {group.options.map(option => {
+                                            const isSelected = (currentModifications[group.name] || []).includes(option);
+                                            return (
+                                                <label key={option} className={`flex items-center p-3 rounded-xl border cursor-pointer transition-all ${isSelected ? 'bg-white border-[#859F31] shadow-sm' : 'border-transparent hover:bg-gray-100'}`}>
+                                                    <div className={`w-5 h-5 rounded-full border flex items-center justify-center mr-3 ${isSelected ? 'bg-[#859F31] border-[#859F31]' : 'border-gray-300 bg-white'}`}>
+                                                        {isSelected && <CheckCircle size={12} className="text-white" />}
+                                                    </div>
+                                                    <input 
+                                                        type={group.multiSelect ? "checkbox" : "radio"}
+                                                        name={group.name}
+                                                        className="hidden"
+                                                        checked={isSelected}
+                                                        onChange={() => toggleModification(group.name, option, group.multiSelect)}
+                                                    />
+                                                    <span className={`text-sm ${isSelected ? 'text-gray-900 font-semibold' : 'text-gray-600'}`}>{option}</span>
+                                                </label>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    </div>
+                    )}
 
                     {/* Ingredients */}
                     <div className="mb-8">
@@ -340,28 +409,17 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                             )) || <p className="text-sm text-gray-400">Ingredients info unavailable.</p>}
                         </ul>
                     </div>
-                    
-                    {/* Allergens */}
-                    {selectedItem.allergens && selectedItem.allergens.length > 0 && (
-                        <div className="mb-8">
-                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Allergens</h3>
-                            <div className="flex flex-wrap gap-2">
-                                {selectedItem.allergens.map(a => (
-                                    <span key={a} className="px-3 py-1 bg-[#859F31]/10 text-[#859F31] rounded-lg text-xs font-bold">{a}</span>
-                                ))}
-                            </div>
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Sticky Bottom Action - Outside Scroll View */}
             <div className="p-6 border-t border-gray-100 bg-white safe-area-bottom">
                 <button 
-                    onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}
-                    className="w-full bg-[#859F31] text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 hover:bg-[#6d8228] transition-colors"
+                    onClick={addToCart}
+                    disabled={!isModificationValid}
+                    className="w-full bg-[#859F31] disabled:bg-gray-300 disabled:cursor-not-allowed text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 disabled:shadow-none hover:bg-[#6d8228] transition-colors"
                 >
-                    Add to Cart • ${selectedItem.price}
+                    {isModificationValid ? `Add to Cart • $${selectedItem.price}` : 'Select Required Options'}
                 </button>
             </div>
         </div>
@@ -397,19 +455,29 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                     {cart.length === 0 ? (
                         <div className="text-center py-10 text-gray-400">Your cart is empty.</div>
                     ) : (
-                        cart.map(item => (
-                            <div key={item.id} className="flex items-center gap-4">
+                        cart.map((item, idx) => (
+                            <div key={idx} className="flex items-start gap-4">
                                 <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0">
                                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-semibold font-['Poppins'] text-gray-900 text-sm mb-1">{item.name}</h4>
+                                    {/* Display Selected Modifications */}
+                                    {item.selectedModifications && Object.keys(item.selectedModifications).length > 0 && (
+                                        <div className="flex flex-wrap gap-1 mb-1">
+                                            {Object.entries(item.selectedModifications).map(([key, values]) => (
+                                                <span key={key} className="text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">
+                                                    {values.join(', ')}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    )}
                                     <p className="font-semibold font-['Poppins'] text-[#859F31] text-sm">${item.price}</p>
                                 </div>
-                                <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-2 py-1">
-                                    <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-[#859F31]"><Minus size={14}/></button>
+                                <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-2 py-1 self-center">
+                                    <button onClick={() => updateQuantity(idx, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-[#859F31]"><Minus size={14}/></button>
                                     <span className="font-bold text-sm w-4 text-center">{item.quantity}</span>
-                                    <button onClick={() => updateQuantity(item.id, 1)} className="w-6 h-6 flex items-center justify-center text-gray-800 hover:text-[#859F31]"><Plus size={14}/></button>
+                                    <button onClick={() => updateQuantity(idx, 1)} className="w-6 h-6 flex items-center justify-center text-gray-800 hover:text-[#859F31]"><Plus size={14}/></button>
                                 </div>
                             </div>
                         ))

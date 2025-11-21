@@ -10,7 +10,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 20.50,
     category: 'Entrees',
     image: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=800&q=80',
-    calories: 520,
     protein: '54g',
     fats: '36g',
     carbs: '15g',
@@ -18,7 +17,23 @@ export const MENU_ITEMS: MenuItem[] = [
     ingredients: ['Dried spaghetti', 'Chicken breast', 'Yellow onion', 'Green garlic', 'Olive oil', 'Red pepper', 'Broccoli'],
     allergens: ['Gluten', 'Soy'],
     isSpicy: true,
-    isPopular: true
+    isPopular: true,
+    modifications: [
+      {
+        id: 'm1',
+        name: 'Spice Level',
+        options: ['Mild', 'Medium', 'Hot', 'Extra Hot'],
+        required: true,
+        multiSelect: false
+      },
+      {
+        id: 'm2',
+        name: 'Vegetables',
+        options: ['No Onions', 'No Garlic', 'No Broccoli'],
+        required: false,
+        multiSelect: true
+      }
+    ]
   },
   {
     id: '2',
@@ -27,14 +42,29 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 15.50,
     category: 'Entrees',
     image: 'https://images.unsplash.com/photo-1550304943-4f24f54ddde9?w=800&q=80',
-    calories: 320,
     protein: '12g',
     fats: '18g',
     carbs: '10g',
     sugar: '4g',
     ingredients: ['Romaine lettuce', 'Parmesan cheese', 'Croutons', 'Caesar dressing', 'Black pepper'],
     allergens: ['Dairy', 'Gluten', 'Eggs'],
-    isVegetarian: true
+    isVegetarian: true,
+    modifications: [
+        {
+            id: 'm3',
+            name: 'Dressing',
+            options: ['Regular', 'Light', 'On the Side'],
+            required: true,
+            multiSelect: false
+        },
+        {
+            id: 'm4',
+            name: 'Extras',
+            options: ['Add Chicken (+$5)', 'Extra Cheese', 'No Croutons'],
+            required: false,
+            multiSelect: true
+        }
+    ]
   },
   {
     id: '3',
@@ -43,7 +73,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 10.50,
     category: 'Grab & Go',
     image: 'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800&q=80',
-    calories: 450,
     protein: '28g',
     fats: '15g',
     carbs: '40g',
@@ -59,7 +88,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 15.50,
     category: 'Entrees',
     image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&q=80',
-    calories: 380,
     protein: '25g',
     fats: '12g',
     carbs: '22g',
@@ -74,14 +102,22 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 18.50,
     category: 'Entrees',
     image: 'https://images.unsplash.com/photo-1558030006-450675393462?w=800&q=80',
-    calories: 650,
     protein: '45g',
     fats: '28g',
     carbs: '55g',
     sugar: '4g',
     ingredients: ['Beef steak', 'White rice', 'Broccoli', 'Soy sauce', 'Garlic'],
     allergens: ['Soy'],
-    isPopular: true
+    isPopular: true,
+    modifications: [
+        {
+            id: 'm5',
+            name: 'Doneness',
+            options: ['Rare', 'Medium Rare', 'Medium', 'Well Done'],
+            required: true,
+            multiSelect: false
+        }
+    ]
   },
   {
     id: '6',
@@ -90,7 +126,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 12.50,
     category: 'Entrees',
     image: 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80',
-    calories: 280,
     protein: '8g',
     fats: '10g',
     carbs: '35g',
@@ -106,7 +141,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 2.50,
     category: 'Drinks',
     image: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=800&q=80',
-    calories: 0,
     protein: '0g',
     fats: '0g',
     carbs: '0g',
@@ -121,7 +155,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 5.00,
     category: 'Drinks',
     image: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=800&q=80',
-    calories: 110,
     protein: '2g',
     fats: '0g',
     carbs: '26g',
@@ -137,7 +170,6 @@ export const MENU_ITEMS: MenuItem[] = [
     price: 3.50,
     category: 'Snacks',
     image: 'https://images.unsplash.com/photo-1499636138143-bd649043ea29?w=800&q=80',
-    calories: 250,
     protein: '3g',
     fats: '12g',
     carbs: '30g',

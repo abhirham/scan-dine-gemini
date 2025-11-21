@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRestaurant } from '../context/RestaurantContext';
-import { OrderStatus, MenuItem } from '../types';
+import { OrderStatus, MenuItem, ModificationGroup } from '../types';
 import { 
   LayoutDashboard, 
   DollarSign, 
@@ -14,7 +14,8 @@ import {
   Edit,
   Trash2,
   X,
-  Save
+  Save,
+  Layers
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -42,16 +43,17 @@ export const AdminView: React.FC = () => {
     price: '',
     category: 'Entrees',
     image: '',
-    calories: '',
     isSpicy: false,
     isVegetarian: false,
     isPopular: false
   };
   const [formData, setFormData] = useState(initialFormState);
+  const [modifications, setModifications] = useState<ModificationGroup[]>([]);
 
   const openAddModal = () => {
     setEditingItem(null);
     setFormData(initialFormState);
+    setModifications([]);
     setIsMenuModalOpen(true);
   };
 
@@ -63,12 +65,41 @@ export const AdminView: React.FC = () => {
         price: item.price.toString(),
         category: item.category,
         image: item.image,
-        calories: item.calories ? item.calories.toString() : '',
         isSpicy: !!item.isSpicy,
         isVegetarian: !!item.isVegetarian,
         isPopular: !!item.isPopular
     });
+    setModifications(item.modifications ? [...item.modifications] : []);
     setIsMenuModalOpen(true);
+  };
+
+  // Modifications Logic
+  const addModificationGroup = () => {
+    setModifications([
+      ...modifications,
+      {
+        id: Math.random().toString(36).substr(2, 9),
+        name: '',
+        options: [],
+        required: false,
+        multiSelect: false
+      }
+    ]);
+  };
+
+  const updateModificationGroup = (index: number, field: keyof ModificationGroup, value: any) => {
+    const newMods = [...modifications];
+    newMods[index] = { ...newMods[index], [field]: value };
+    setModifications(newMods);
+  };
+
+  const updateModificationOptions = (index: number, optionsString: string) => {
+    const options = optionsString.split(',').map(s => s.trim()).filter(s => s.length > 0);
+    updateModificationGroup(index, 'options', options);
+  };
+
+  const removeModificationGroup = (index: number) => {
+    setModifications(modifications.filter((_, i) => i !== index));
   };
 
   const handleSave = (e: React.FormEvent) => {
@@ -79,7 +110,6 @@ export const AdminView: React.FC = () => {
         price: parseFloat(formData.price) || 0,
         category: formData.category as any,
         image: formData.image || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&q=80',
-        calories: parseInt(formData.calories) || 0,
         isSpicy: formData.isSpicy,
         isVegetarian: formData.isVegetarian,
         isPopular: formData.isPopular,
@@ -88,7 +118,8 @@ export const AdminView: React.FC = () => {
         carbs: editingItem?.carbs || '0g', 
         sugar: editingItem?.sugar || '0g', 
         ingredients: editingItem?.ingredients || [], 
-        allergens: editingItem?.allergens || []
+        allergens: editingItem?.allergens || [],
+        modifications: modifications
     };
 
     if (editingItem) {
@@ -397,7 +428,7 @@ export const AdminView: React.FC = () => {
         {/* Menu Modal */}
         {isMenuModalOpen && (
             <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-                <div className="bg-white w-full max-w-lg rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
+                <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-900">{editingItem ? 'Edit Item' : 'Add New Item'}</h2>
                         <button onClick={() => setIsMenuModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
@@ -496,15 +527,81 @@ export const AdminView: React.FC = () => {
                                 <span className="text-sm text-gray-700">Vegetarian</span>
                             </label>
                         </div>
-                        
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Calories (kcal)</label>
-                            <input 
-                                type="number" 
-                                value={formData.calories}
-                                onChange={(e) => setFormData({...formData, calories: e.target.value})}
-                                className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none bg-white text-gray-900"
-                            />
+
+                        {/* Modifications Section */}
+                        <div className="border-t border-gray-200 pt-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <label className="block text-sm font-bold text-gray-800">Allowed Modifications</label>
+                                <button 
+                                    type="button"
+                                    onClick={addModificationGroup}
+                                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-800 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                                >
+                                    + Add Group
+                                </button>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {modifications.map((group, idx) => (
+                                    <div key={group.id} className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Group {idx + 1}</h4>
+                                            <button 
+                                                type="button"
+                                                onClick={() => removeModificationGroup(idx)}
+                                                className="text-red-400 hover:text-red-600"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Group Name (e.g. Spice Level)</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={group.name}
+                                                    onChange={(e) => updateModificationGroup(idx, 'name', e.target.value)}
+                                                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-500 text-gray-900"
+                                                    placeholder="Name"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-xs text-gray-500 mb-1">Options (Comma separated)</label>
+                                                <input 
+                                                    type="text" 
+                                                    value={group.options.join(', ')}
+                                                    onChange={(e) => updateModificationOptions(idx, e.target.value)}
+                                                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-500 text-gray-900"
+                                                    placeholder="Mild, Medium, Hot"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-4">
+                                             <label className="flex items-center gap-2 cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={group.required}
+                                                    onChange={(e) => updateModificationGroup(idx, 'required', e.target.checked)}
+                                                    className="w-4 h-4 text-indigo-600 rounded bg-white"
+                                                />
+                                                <span className="text-xs text-gray-700">Mandatory Selection</span>
+                                            </label>
+                                             <label className="flex items-center gap-2 cursor-pointer">
+                                                <input 
+                                                    type="checkbox" 
+                                                    checked={group.multiSelect}
+                                                    onChange={(e) => updateModificationGroup(idx, 'multiSelect', e.target.checked)}
+                                                    className="w-4 h-4 text-indigo-600 rounded bg-white"
+                                                />
+                                                <span className="text-xs text-gray-700">Allow Multiple Selections</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                ))}
+                                {modifications.length === 0 && (
+                                    <p className="text-sm text-gray-400 italic text-center py-2">No modifications added yet.</p>
+                                )}
+                            </div>
                         </div>
 
                         <div className="pt-4">
