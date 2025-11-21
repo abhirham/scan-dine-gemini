@@ -42,13 +42,12 @@ const CategoryPill: React.FC<{
 const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number }> = ({ item, onClick, idx }) => (
   <div 
     onClick={onClick}
-    className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer group animate-fade-in-up flex flex-row gap-4 h-full items-stretch"
-    style={{ animationDelay: `${idx * 50}ms` }}
+    className="p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer group flex flex-row gap-4 items-center"
   >
     {/* Text Section (Left) */}
-    <div className="flex flex-col flex-1 justify-between py-1">
+    <div className="flex flex-col flex-1 justify-between self-stretch py-1">
       <div>
-        <h4 className="font-['Poppins'] font-semibold text-gray-900 text-lg leading-tight mb-2">{item.name}</h4>
+        <h4 className="font-['Poppins'] font-semibold text-gray-900 text-base leading-tight mb-1">{item.name}</h4>
         
         <p className="text-xs text-gray-500 font-medium leading-relaxed line-clamp-2 mb-2">
             {item.description}
@@ -57,17 +56,17 @@ const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number 
 
       <div className="flex items-center gap-3 mt-auto">
           {/* Poppins Font for Price, styled like the reference - Semi Bold */}
-          <span className="font-['Poppins'] font-semibold text-xl text-gray-900 flex items-baseline gap-0.5">
-              <span className="text-sm align-top pt-0.5">$</span>{item.price}
+          <span className="font-['Poppins'] font-semibold text-lg text-gray-900 flex items-baseline gap-0.5">
+              <span className="text-xs align-top pt-0.5">$</span>{item.price}
           </span>
           
           {/* Spiciness Indicators */}
           <div className="flex gap-0.5 mb-1">
               {item.isSpicy && (
                   <>
-                    <Flame size={14} className="text-orange-500 fill-orange-500" />
-                    <Flame size={14} className="text-orange-300 fill-orange-300" />
-                    <Flame size={14} className="text-gray-200 fill-gray-200" />
+                    <Flame size={12} className="text-orange-500 fill-orange-500" />
+                    <Flame size={12} className="text-orange-300 fill-orange-300" />
+                    <Flame size={12} className="text-gray-200 fill-gray-200" />
                   </>
               )}
           </div>
@@ -75,16 +74,16 @@ const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void; idx: number 
     </div>
 
     {/* Image Section (Right) */}
-    <div className="relative w-32 h-32 shrink-0">
-      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-[1.5rem] shadow-sm" />
+    <div className="relative w-24 h-24 shrink-0">
+      <img src={item.image} alt={item.name} className="w-full h-full object-cover rounded-xl shadow-sm" />
       
       {/* Heart Icon (top right inside image) - Only for Popular Items */}
       {item.isPopular && (
-        <div className="absolute top-2 right-2 flex items-center justify-center w-7 h-7 bg-white rounded-full shadow-sm">
+        <div className="absolute top-1 right-1 flex items-center justify-center w-6 h-6 bg-white rounded-full shadow-sm">
             <div className="absolute top-0 right-0">
                 <span className="sr-only">Like</span>
             </div>
-            <Heart size={14} className="text-[#859F31] fill-[#859F31]" />
+            <Heart size={12} className="text-[#859F31] fill-[#859F31]" />
         </div>
       )}
     </div>
@@ -212,7 +211,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
             </div>
           )}
 
-          {/* Menu Grid */}
+          {/* Menu List */}
           <div className="px-6 pb-6">
             {searchTerm ? (
                 // Search Mode: Group results by category
@@ -228,7 +227,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                         return (
                             <div key={cat.id} className="mb-8">
                                 <h3 className="text-xl font-bold mb-4 font-['Poppins']">{cat.label}</h3>
-                                <div className="flex flex-col gap-4">
+                                <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
                                     {catItems.map((item, idx) => (
                                         <MenuItemCard 
                                             key={item.id} 
@@ -252,21 +251,21 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 // Standard Category Mode
                 <>
                     <h3 className="text-xl font-bold mb-4 font-['Poppins']">{activeCategory}</h3>
-                    <div className="flex flex-col gap-4">
-                    {filteredMenu.map((item, idx) => (
-                        <MenuItemCard 
-                            key={item.id} 
-                            item={item} 
-                            onClick={() => setSelectedItem(item)} 
-                            idx={idx} 
-                        />
-                    ))}
+                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden animate-fade-in-up">
+                        {filteredMenu.map((item, idx) => (
+                            <MenuItemCard 
+                                key={item.id} 
+                                item={item} 
+                                onClick={() => setSelectedItem(item)} 
+                                idx={idx} 
+                            />
+                        ))}
+                        {filteredMenu.length === 0 && (
+                            <div className="text-center py-12 text-gray-400">
+                                <p>No items found in this category.</p>
+                            </div>
+                        )}
                     </div>
-                    {filteredMenu.length === 0 && (
-                        <div className="text-center py-12 text-gray-400">
-                            <p>No items found in this category.</p>
-                        </div>
-                    )}
                 </>
             )}
           </div>
