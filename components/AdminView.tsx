@@ -211,34 +211,36 @@ export const AdminView: React.FC = () => {
       <main className="flex-1 overflow-y-auto relative">
         <div className="p-8">
           
-          {/* Header Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-green-100 text-green-600 rounded-xl"><DollarSign size={24} /></div>
-                    <span className="text-sm text-gray-400 font-medium">+2.5%</span>
-                </div>
-                <h3 className="text-3xl font-bold text-gray-800">${totalRevenue.toFixed(2)}</h3>
-                <p className="text-sm text-gray-500 mt-1">Total Revenue Today</p>
-            </div>
+          {/* Header Stats - Hide on Menu Management Page */}
+          {activeTab !== 'menu' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-green-100 text-green-600 rounded-xl"><DollarSign size={24} /></div>
+                      <span className="text-sm text-gray-400 font-medium">+2.5%</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-800">${totalRevenue.toFixed(2)}</h3>
+                  <p className="text-sm text-gray-500 mt-1">Total Revenue Today</p>
+              </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-orange-100 text-orange-600 rounded-xl"><Coffee size={24} /></div>
-                </div>
-                <h3 className="text-3xl font-bold text-gray-800">{activeTables}</h3>
-                <p className="text-sm text-gray-500 mt-1">Active Tables</p>
-            </div>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-orange-100 text-orange-600 rounded-xl"><Coffee size={24} /></div>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-800">{activeTables}</h3>
+                  <p className="text-sm text-gray-500 mt-1">Active Tables</p>
+              </div>
 
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                    <div className="p-3 bg-blue-100 text-blue-600 rounded-xl"><Users size={24} /></div>
-                    <span className="text-sm text-gray-400 font-medium">Pending: ${pendingRevenue.toFixed(2)}</span>
-                </div>
-                <h3 className="text-3xl font-bold text-gray-800">{unpaidOrders.length}</h3>
-                <p className="text-sm text-gray-500 mt-1">Open Orders</p>
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                      <div className="p-3 bg-blue-100 text-blue-600 rounded-xl"><Users size={24} /></div>
+                      <span className="text-sm text-gray-400 font-medium">Pending: ${pendingRevenue.toFixed(2)}</span>
+                  </div>
+                  <h3 className="text-3xl font-bold text-gray-800">{unpaidOrders.length}</h3>
+                  <p className="text-sm text-gray-500 mt-1">Open Orders</p>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Tab Content */}
           {activeTab === 'overview' && (

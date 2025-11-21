@@ -467,7 +467,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                                         <div className="flex flex-wrap gap-1 mb-1">
                                             {Object.entries(item.selectedModifications).map(([key, values]) => (
                                                 <span key={key} className="text-xs text-gray-500 bg-gray-50 px-1.5 py-0.5 rounded">
-                                                    {values.join(', ')}
+                                                    {(values as string[]).join(', ')}
                                                 </span>
                                             ))}
                                         </div>
