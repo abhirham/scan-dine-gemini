@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useRestaurant } from '../context/RestaurantContext';
 import { OrderStatus, MenuItem, ModificationGroup } from '../types';
 import { 
@@ -15,7 +15,7 @@ import {
   Trash2,
   X,
   Save,
-  Layers
+  AlertTriangle
 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 
@@ -35,6 +35,7 @@ export const AdminView: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'payments' | 'requests' | 'menu'>('overview');
   const [isMenuModalOpen, setIsMenuModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null); // Track item to delete
 
   // Form State
   const initialFormState = {
@@ -71,6 +72,18 @@ export const AdminView: React.FC = () => {
     });
     setModifications(item.modifications ? [...item.modifications] : []);
     setIsMenuModalOpen(true);
+  };
+
+  const initiateDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeletingId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deletingId) {
+      deleteMenuItem(deletingId);
+      setDeletingId(null);
+    }
   };
 
   // Modifications Logic
@@ -175,18 +188,21 @@ export const AdminView: React.FC = () => {
         
         <nav className="flex-1 px-4 space-y-2">
             <button 
+                type="button"
                 onClick={() => setActiveTab('overview')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'overview' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
             >
                 <LayoutDashboard size={20} /> Overview
             </button>
             <button 
+                type="button"
                 onClick={() => setActiveTab('payments')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'payments' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
             >
                 <DollarSign size={20} /> Payments & Refunds
             </button>
             <button 
+                type="button"
                 onClick={() => setActiveTab('requests')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'requests' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
             >
@@ -199,6 +215,7 @@ export const AdminView: React.FC = () => {
                  Service Requests
             </button>
             <button 
+                type="button"
                 onClick={() => setActiveTab('menu')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${activeTab === 'menu' ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-500 hover:bg-gray-50'}`}
             >
@@ -282,6 +299,7 @@ export const AdminView: React.FC = () => {
                                 <div className="flex items-center gap-4">
                                     <div className="text-lg font-bold text-gray-900">${order.totalAmount}</div>
                                     <button 
+                                        type="button"
                                         onClick={() => processPayment(order.id)}
                                         className="p-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
                                         title="Mark Paid"
@@ -309,6 +327,7 @@ export const AdminView: React.FC = () => {
                                 <div className="flex items-center gap-4">
                                     <div className="font-medium text-gray-900">${order.totalAmount}</div>
                                     <button 
+                                        type="button"
                                         onClick={() => {
                                             if(window.confirm("Are you sure you want to refund this order?")) {
                                                 processRefund(order.id);
@@ -347,6 +366,7 @@ export const AdminView: React.FC = () => {
                                 </div>
                                 {req.status === 'PENDING' ? (
                                     <button 
+                                        type="button"
                                         onClick={() => resolveServiceRequest(req.id)}
                                         className="px-4 py-2 bg-white border border-gray-200 shadow-sm text-gray-700 rounded-lg hover:bg-gray-50 text-sm font-medium"
                                     >
@@ -367,6 +387,7 @@ export const AdminView: React.FC = () => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center">
                     <h2 className="text-lg font-bold text-gray-800">Menu Items</h2>
                     <button 
+                        type="button"
                         onClick={openAddModal}
                         className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
                     >
@@ -409,11 +430,16 @@ export const AdminView: React.FC = () => {
                                     </td>
                                     <td className="p-4 text-right">
                                         <div className="flex items-center justify-end gap-2">
-                                            <button onClick={() => openEditModal(item)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg">
+                                            <button type="button" onClick={() => openEditModal(item)} className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg" title="Edit Item">
                                                 <Edit size={18} />
                                             </button>
-                                            <button onClick={() => { if(window.confirm('Delete item?')) deleteMenuItem(item.id) }} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg">
-                                                <Trash2 size={18} />
+                                            <button 
+                                                type="button"
+                                                onClick={(e) => initiateDelete(e, item.id)}
+                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                                                title="Delete Item"
+                                            >
+                                                <Trash2 size={18} className="pointer-events-none" />
                                             </button>
                                         </div>
                                     </td>
@@ -427,13 +453,40 @@ export const AdminView: React.FC = () => {
 
         </div>
 
+        {/* Delete Confirmation Modal */}
+        {deletingId && (
+          <div className="fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white w-full max-w-sm rounded-2xl shadow-2xl animate-fade-in-up p-6 text-center">
+              <div className="w-12 h-12 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="text-lg font-bold text-gray-900 mb-2">Delete Item?</h3>
+              <p className="text-sm text-gray-500 mb-6">Are you sure you want to delete this menu item? This action cannot be undone.</p>
+              <div className="flex gap-3 justify-center">
+                <button 
+                  onClick={() => setDeletingId(null)}
+                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={confirmDelete}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Menu Modal */}
         {isMenuModalOpen && (
             <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
                 <div className="bg-white w-full max-w-2xl rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto animate-fade-in-up">
                     <div className="p-6 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
                         <h2 className="text-xl font-bold text-gray-900">{editingItem ? 'Edit Item' : 'Add New Item'}</h2>
-                        <button onClick={() => setIsMenuModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                        <button type="button" onClick={() => setIsMenuModalOpen(false)} className="p-2 hover:bg-gray-100 rounded-full">
                             <X size={20} />
                         </button>
                     </div>
@@ -574,44 +627,42 @@ export const AdminView: React.FC = () => {
                                                     value={group.options.join(', ')}
                                                     onChange={(e) => updateModificationOptions(idx, e.target.value)}
                                                     className="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-indigo-500 text-gray-900"
-                                                    placeholder="Mild, Medium, Hot"
+                                                    placeholder="Option 1, Option 2..."
                                                 />
                                             </div>
                                         </div>
                                         <div className="flex gap-4">
-                                             <label className="flex items-center gap-2 cursor-pointer">
+                                            <label className="flex items-center gap-2 cursor-pointer">
                                                 <input 
                                                     type="checkbox" 
                                                     checked={group.required}
                                                     onChange={(e) => updateModificationGroup(idx, 'required', e.target.checked)}
-                                                    className="w-4 h-4 text-indigo-600 rounded bg-white"
+                                                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 bg-white"
                                                 />
-                                                <span className="text-xs text-gray-700">Mandatory Selection</span>
+                                                <span className="text-xs text-gray-700 font-medium">Mandatory</span>
                                             </label>
-                                             <label className="flex items-center gap-2 cursor-pointer">
+                                            <label className="flex items-center gap-2 cursor-pointer">
                                                 <input 
                                                     type="checkbox" 
                                                     checked={group.multiSelect}
                                                     onChange={(e) => updateModificationGroup(idx, 'multiSelect', e.target.checked)}
-                                                    className="w-4 h-4 text-indigo-600 rounded bg-white"
+                                                    className="w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 bg-white"
                                                 />
-                                                <span className="text-xs text-gray-700">Allow Multiple Selections</span>
+                                                <span className="text-xs text-gray-700 font-medium">Allow Multiple Selection</span>
                                             </label>
                                         </div>
                                     </div>
                                 ))}
-                                {modifications.length === 0 && (
-                                    <p className="text-sm text-gray-400 italic text-center py-2">No modifications added yet.</p>
-                                )}
                             </div>
                         </div>
 
-                        <div className="pt-4">
+                        <div className="pt-4 flex justify-end">
                             <button 
                                 type="submit"
-                                className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-500/30 transition-all flex items-center justify-center gap-2"
+                                className="bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors flex items-center gap-2 shadow-lg shadow-indigo-200"
                             >
-                                <Save size={20} /> Save Item
+                                <Save size={20} />
+                                {editingItem ? 'Save Changes' : 'Create Item'}
                             </button>
                         </div>
                     </form>
