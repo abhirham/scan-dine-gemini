@@ -275,99 +275,105 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
 
       {/* --- PRODUCT DETAIL SCREEN (MODAL) --- */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-slide-up">
-          <div className="relative h-72 w-full bg-gray-100">
-             <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
-             <button 
-                onClick={() => setSelectedItem(null)}
-                className="absolute top-4 left-4 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-800 shadow-sm hover:bg-white"
-             >
-                <X size={20} />
-             </button>
-             {/* Pagination dots simulation */}
-             <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-                <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-                <div className="w-2 h-2 bg-white/50 rounded-full"></div>
-             </div>
-          </div>
+        // Using Flexbox to ensure sticky footer logic is robust inside the modal
+        <div className="fixed inset-0 z-50 bg-white flex flex-col animate-slide-up">
+            
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto">
+                <div className="relative h-72 w-full bg-gray-100">
+                    <img src={selectedItem.image} alt={selectedItem.name} className="w-full h-full object-cover" />
+                    <button 
+                        onClick={() => setSelectedItem(null)}
+                        className="absolute top-4 left-4 w-10 h-10 bg-white/80 backdrop-blur rounded-full flex items-center justify-center text-gray-800 shadow-sm hover:bg-white"
+                    >
+                        <X size={20} />
+                    </button>
+                    {/* Pagination dots simulation */}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                        <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+                        <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+                    </div>
+                </div>
 
-          <div className="px-6 py-6 pb-32">
-            <div className="flex justify-between items-start mb-6">
-                {/* Semi Bold for detail view too */}
-                <h1 className="text-2xl font-['Poppins'] font-semibold text-gray-900 w-3/4 leading-tight">{selectedItem.name}</h1>
-                <span className="text-2xl font-['Poppins'] font-semibold text-teal-500">${selectedItem.price}</span>
-            </div>
+                <div className="px-6 py-6">
+                    <div className="flex justify-between items-start mb-6">
+                        <h1 className="text-2xl font-['Poppins'] font-semibold text-gray-900 w-3/4 leading-tight">{selectedItem.name}</h1>
+                        {/* UPDATED PRICE COLOR */}
+                        <span className="text-2xl font-['Poppins'] font-semibold text-[#859F31]">${selectedItem.price}</span>
+                    </div>
 
-            {/* Nutrition Summary */}
-            <div className="mb-8">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Nutrition Summary</h3>
-                <div className="bg-gray-50 rounded-2xl p-4 flex justify-between border border-gray-100">
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-400 mb-1">Calories</span>
-                        <span className="font-bold text-gray-900">{selectedItem.calories || 350}g</span>
+                    {/* Nutrition Summary */}
+                    <div className="mb-8">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Nutrition Summary</h3>
+                        <div className="bg-gray-50 rounded-2xl p-4 flex justify-between border border-gray-100">
+                            <div className="flex flex-col items-center">
+                                <span className="text-xs text-gray-400 mb-1">Calories</span>
+                                <span className="font-bold text-gray-900">{selectedItem.calories || 350}g</span>
+                            </div>
+                            <div className="w-px bg-gray-200"></div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-xs text-gray-400 mb-1">Protein</span>
+                                <span className="font-bold text-gray-900">{selectedItem.protein || '20g'}</span>
+                            </div>
+                            <div className="w-px bg-gray-200"></div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-xs text-gray-400 mb-1">Fats</span>
+                                <span className="font-bold text-gray-900">{selectedItem.fats || '10g'}</span>
+                            </div>
+                            <div className="w-px bg-gray-200"></div>
+                            <div className="flex flex-col items-center">
+                                <span className="text-xs text-gray-400 mb-1">Carbs</span>
+                                <span className="font-bold text-gray-900">{selectedItem.carbs || '45g'}</span>
+                            </div>
+                        </div>
                     </div>
-                    <div className="w-px bg-gray-200"></div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-400 mb-1">Protein</span>
-                        <span className="font-bold text-gray-900">{selectedItem.protein || '20g'}</span>
+
+                    {/* Ingredients */}
+                    <div className="mb-8">
+                        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Ingredients</h3>
+                        <ul className="space-y-3">
+                            {selectedItem.ingredients?.map((ing, i) => (
+                                <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-700">
+                                    <div className="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
+                                    {ing}
+                                </li>
+                            )) || <p className="text-sm text-gray-400">Ingredients info unavailable.</p>}
+                        </ul>
                     </div>
-                    <div className="w-px bg-gray-200"></div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-400 mb-1">Fats</span>
-                        <span className="font-bold text-gray-900">{selectedItem.fats || '10g'}</span>
-                    </div>
-                    <div className="w-px bg-gray-200"></div>
-                    <div className="flex flex-col items-center">
-                        <span className="text-xs text-gray-400 mb-1">Carbs</span>
-                        <span className="font-bold text-gray-900">{selectedItem.carbs || '45g'}</span>
-                    </div>
+                    
+                    {/* Allergens */}
+                    {selectedItem.allergens && selectedItem.allergens.length > 0 && (
+                        <div className="mb-8">
+                            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Allergens</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {selectedItem.allergens.map(a => (
+                                    <span key={a} className="px-3 py-1 bg-[#859F31]/10 text-[#859F31] rounded-lg text-xs font-bold">{a}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
-            {/* Ingredients */}
-            <div className="mb-8">
-                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Ingredients</h3>
-                <ul className="space-y-3">
-                    {selectedItem.ingredients?.map((ing, i) => (
-                        <li key={i} className="flex items-center gap-3 text-sm font-medium text-gray-700">
-                            <div className="w-1.5 h-1.5 bg-gray-300 rounded-full"></div>
-                            {ing}
-                        </li>
-                    )) || <p className="text-sm text-gray-400">Ingredients info unavailable.</p>}
-                </ul>
+            {/* Sticky Bottom Action - Outside Scroll View */}
+            <div className="p-6 border-t border-gray-100 bg-white safe-area-bottom">
+                <button 
+                    onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}
+                    className="w-full bg-[#859F31] text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 hover:bg-[#6d8228] transition-colors"
+                >
+                    Add to Cart • ${selectedItem.price}
+                </button>
             </div>
-             
-             {/* Allergens */}
-             {selectedItem.allergens && selectedItem.allergens.length > 0 && (
-                 <div className="mb-8">
-                    <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Allergens</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {selectedItem.allergens.map(a => (
-                            <span key={a} className="px-3 py-1 bg-[#859F31]/10 text-[#859F31] rounded-lg text-xs font-bold">{a}</span>
-                        ))}
-                    </div>
-                 </div>
-             )}
-          </div>
-
-          {/* Sticky Bottom Action */}
-          <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6 safe-area-bottom">
-            <button 
-                onClick={() => { addToCart(selectedItem); setSelectedItem(null); }}
-                className="w-full bg-[#859F31] text-white text-lg font-bold py-4 rounded-2xl shadow-xl shadow-[#859F31]/40 hover:bg-[#6d8228] transition-colors"
-            >
-                Add to Cart • ${selectedItem.price}
-            </button>
-          </div>
         </div>
       )}
 
       {/* --- CART SCREEN --- */}
       {isCartOpen && (
-        <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-slide-up">
+        // Using Flexbox layout for Cart as well for consistency
+        <div className="fixed inset-0 z-50 bg-white flex flex-col animate-slide-up">
             {/* Header */}
-            <div className="sticky top-0 bg-white z-10 px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between shrink-0">
                 <button onClick={() => setIsCartOpen(false)} className="p-2 -ml-2 hover:bg-gray-50 rounded-full">
                     <X size={24} />
                 </button>
@@ -375,7 +381,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 <div className="w-8"></div> {/* Spacer */}
             </div>
 
-            <div className="px-6 py-6 pb-40">
+            <div className="flex-1 overflow-y-auto px-6 py-6">
                 {/* Location Card (Simulated Address) */}
                 <div className="flex items-center gap-4 mb-8">
                     <div className="w-10 h-10 rounded-full bg-[#859F31]/10 flex items-center justify-center text-[#859F31]">
@@ -399,7 +405,7 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-semibold font-['Poppins'] text-gray-900 text-sm mb-1">{item.name}</h4>
-                                    <p className="font-semibold font-['Poppins'] text-teal-500 text-sm">${item.price}</p>
+                                    <p className="font-semibold font-['Poppins'] text-[#859F31] text-sm">${item.price}</p>
                                 </div>
                                 <div className="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-2 py-1">
                                     <button onClick={() => updateQuantity(item.id, -1)} className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-[#859F31]"><Minus size={14}/></button>
@@ -450,8 +456,8 @@ export const CustomerView: React.FC<CustomerViewProps> = ({ tableId }) => {
                 </div>
             </div>
 
-            {/* Sticky Checkout */}
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-6 safe-area-bottom">
+            {/* Sticky Checkout - Outside Scroll View */}
+            <div className="p-6 border-t border-gray-100 bg-white safe-area-bottom">
                 <div className="flex justify-between items-end mb-4">
                     <span className="text-gray-400 text-sm font-medium">Total</span>
                     <span className="font-semibold text-2xl text-gray-900 font-['Poppins']">${finalTotal.toFixed(2)}</span>
